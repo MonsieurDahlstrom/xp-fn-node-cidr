@@ -14,9 +14,6 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}         # Required for semantic-release auth
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}     # Used by Docker login + GH API
-      GITHUB_ACTOR: ${{ github.actor }}         # Username for docker login
-      GITHUB_REPOSITORY: ${{ github.repository }} # Used in image name
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -38,5 +35,8 @@ jobs:
       - name: Compile TypeScript
         run: npx tsc
 
-      - name: Run semantic-release
-        run: npx semantic-release
+       - name: Run semantic-release
+         run: |
+          export GITHUB_REPOSITORY=${{ github.repository }}
+          export GITHUB_ACTOR=${{ github.actor }}
+          npx semantic-release
