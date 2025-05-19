@@ -12,8 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}         # Required for semantic-release auth
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}     # Used by Docker login + GH API
+      GITHUB_ACTOR: ${{ github.actor }}         # Username for docker login
+      GITHUB_REPOSITORY: ${{ github.repository }} # Used in image name
 
     steps:
       - name: Checkout repo
