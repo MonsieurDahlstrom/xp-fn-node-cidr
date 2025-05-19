@@ -5,6 +5,23 @@
 
 * another release.config.js attempt ([0ed0e84](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/0ed0e846518552a2cc39ececeabfc81900d0c151))
 * reduce the env in workflow ([3c5e3ca](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/3c5e3ca9f8c582f0cb3fac47ebf5b69c42142585))
+* release configuration ([ee48d4c](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/ee48d4cf4f7d93edca196f675451cbe93f8e588a))
+* updating node versions in workflows ([f659a20](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/f659a20ded19a38e559077696347729144b50f12))
+* workflow and release configuration ([83b3a3d](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/83b3a3de9458e47a614ed6570e18e814432e3b16))
+* workflow indentation ([a25a5dd](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/a25a5dda068529688b59d7015c38c62cd11e11bf))
+
+
+### Features
+
+* inital commit ([1a7ccf0](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/1a7ccf0ef45c0704e6b357eac2bfe32f7419aa77))
+
+# 1.0.0 (2025-05-19)
+
+
+### Bug Fixes
+
+* another release.config.js attempt ([0ed0e84](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/0ed0e846518552a2cc39ececeabfc81900d0c151))
+* reduce the env in workflow ([3c5e3ca](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/3c5e3ca9f8c582f0cb3fac47ebf5b69c42142585))
 * updating node versions in workflows ([f659a20](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/f659a20ded19a38e559077696347729144b50f12))
 * workflow and release configuration ([83b3a3d](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/83b3a3de9458e47a614ed6570e18e814432e3b16))
 * workflow indentation ([a25a5dd](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/a25a5dda068529688b59d7015c38c62cd11e11bf))
