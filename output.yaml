@@ -1,0 +1,19 @@
+apiVersion: network.example.org/v1alpha1
+kind: NetworkLayout
+metadata:
+  name: calculated-layout
+spec:
+  baseCIDR: 10.0.0.0/16
+  subnets:
+    - name: management
+      cidr: 10.0.0.0/19
+      prefix: 19
+    - name: workloads
+      cidr: 10.0.32.0/16
+      prefix: 16
+    - name: services
+      cidr: 10.1.32.0/18
+      prefix: 18
+    - name: reserved
+      cidr: 10.1.96.0/19
+      prefix: 19

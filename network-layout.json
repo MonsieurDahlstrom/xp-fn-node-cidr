@@ -1,0 +1,10 @@
+{
+    "baseCIDR": "10.0.0.0/16",
+    "layout": [
+      { "name": "management", "percent": 10 },
+      { "name": "workloads", "percent": 60 },
+      { "name": "services", "percent": 20 },
+      { "name": "reserved", "percent": 10 }
+    ]
+  }
+  

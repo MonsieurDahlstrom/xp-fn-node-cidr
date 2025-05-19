@@ -1,0 +1,36 @@
+{
+  "name": "xp-fn-node-cidr",
+  "version": "1.0.0",
+  "description": "generate a vnet layout",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MonsieurDahlstrom/xp-fn-node-cidr.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/issues"
+  },
+  "homepage": "https://github.com/MonsieurDahlstrom/xp-fn-node-cidr#readme",
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.2",
+    "@semantic-release/release-notes-generator": "^14.0.3",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.15.19",
+    "semantic-release": "^24.2.4",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "ip-cidr": "^4.0.2",
+    "js-yaml": "^4.1.0"
+  }
+}
