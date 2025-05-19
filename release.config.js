@@ -10,8 +10,8 @@ module.exports = {
     }],
     '@semantic-release/github',
     ['@semantic-release/exec', {
-      prepareCmd: 'docker build -t ghcr.io/${env.GITHUB_REPOSITORY}:${nextRelease.version} .',
-      publishCmd: 'echo ${env.GH_TOKEN} | docker login ghcr.io -u ${env.GITHUB_ACTOR} --password-stdin && docker push ghcr.io/${env.GITHUB_REPOSITORY}:${nextRelease.version}'
+      prepareCmd: 'docker build -t ghcr.io/${process.env.GITHUB_REPOSITORY}:${nextRelease.version} .',
+      publishCmd: 'echo ${process.env.GH_TOKEN} | docker login ghcr.io -u ${process.env.GITHUB_ACTOR} --password-stdin && docker push ghcr.io/${process.env.GITHUB_REPOSITORY}:${nextRelease.version}'
     }]
   ]
 }
