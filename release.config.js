@@ -10,8 +10,18 @@ module.exports = {
     }],
     '@semantic-release/github',
     ['@semantic-release/exec', {
-      prepareCmd: 'docker build -t ghcr.io/${process.env.GITHUB_REPOSITORY.toLowerCase()}:${nextRelease.version} .',
-      publishCmd: 'echo ${process.env.GH_TOKEN} | docker login ghcr.io -u ${process.env.GITHUB_ACTOR} --password-stdin && docker push ghcr.io/${process.env.GITHUB_REPOSITORY.toLowerCase()}:${nextRelease.version}'
+      prepareCmd: `
+        docker build \\
+          --label "org.opencontainers.image.source=https://github.com/$\{process.env.GITHUB_REPOSITORY}" \\
+          --label "org.opencontainers.image.description=Automatically released from semantic-release" \\
+          --label "org.opencontainers.image.licenses=MIT" \\
+          -t ghcr.io/$\{process.env.GITHUB_REPOSITORY.toLowerCase()}:$\{nextRelease.version} .
+      `,
+      publishCmd: `
+        docker push ghcr.io/$\{process.env.GITHUB_REPOSITORY.toLowerCase()}:$\{nextRelease.version} && \\
+        docker tag ghcr.io/$\{process.env.GITHUB_REPOSITORY.toLowerCase()}:$\{nextRelease.version} ghcr.io/$\{process.env.GITHUB_REPOSITORY.toLowerCase()}:latest && \\
+        docker push ghcr.io/$\{process.env.GITHUB_REPOSITORY.toLowerCase()}:latest
+      `
     }]
   ]
 }
