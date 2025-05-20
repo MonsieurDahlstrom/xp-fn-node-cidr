@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.0.0...v1.0.1) (2025-05-20)
+
+
+### Bug Fixes
+
+* workflow and configuration changes ([6a9a23c](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/6a9a23c6181cf73bde270434d5eff23645128e9f))
+
 # 1.0.0 (2025-05-20)
 
 
