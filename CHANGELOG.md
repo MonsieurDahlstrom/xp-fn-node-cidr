@@ -4,6 +4,14 @@
 ### Bug Fixes
 
 * buildx ([0fc61d8](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/0fc61d8c3510dbd1189bc6dd5c60561ec10d7200))
+* semantic configuration removed variable ([5b97728](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/5b977282886be61f8fe40fdbda305b7da9de18ae))
+
+## [1.0.2](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.0.1...v1.0.2) (2025-05-20)
+
+
+### Bug Fixes
+
+* buildx ([0fc61d8](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/0fc61d8c3510dbd1189bc6dd5c60561ec10d7200))
 
 ## [1.0.1](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.0.0...v1.0.1) (2025-05-20)
 
