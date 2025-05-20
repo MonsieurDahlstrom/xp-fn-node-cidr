@@ -11,22 +11,20 @@ module.exports = {
     '@semantic-release/github',
     ['@semantic-release/exec', {
       prepareCmd: `
-        IMAGE_NAME="ghcr.io/monsieurdahlstrom/xp-fn-node-cidr"
         docker buildx build \\
           --platform linux/amd64 \\
           --label "org.opencontainers.image.source=https://github.com/MonsieurDahlstrom/xp-fn-node-cidr" \\
           --label "org.opencontainers.image.description=Node CIDR calculator" \\
           --label "org.opencontainers.image.version=$\{nextRelease.version}" \\
           --label "org.opencontainers.image.licenses=ISC" \\
-          -t $\{IMAGE_NAME}:$\{nextRelease.version} \\
-          -t $\{IMAGE_NAME}:latest \\
+          -t ghcr.io/monsieurdahlstrom/xp-fn-node-cidr:$\{nextRelease.version} \\
+          -t ghcr.io/monsieurdahlstrom/xp-fn-node-cidr:latest \\
           --output=type=docker \\
           .
       `,
       publishCmd: `
-        IMAGE_NAME="ghcr.io/monsieurdahlstrom/xp-fn-node-cidr"
-        docker push $\{IMAGE_NAME}:$\{nextRelease.version}
-        docker push $\{IMAGE_NAME}:latest
+        docker push ghcr.io/monsieurdahlstrom/xp-fn-node-cidr:$\{nextRelease.version}
+        docker push ghcr.io/monsieurdahlstrom/xp-fn-node-cidr:latest
       `
     }]
   ]
