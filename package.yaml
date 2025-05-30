@@ -1,0 +1,39 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Function
+metadata:
+  name: function-node-cidr
+  annotations:
+    meta.crossplane.io/maintainer: MonsieurDahlstrom mathias@monsieurdahlstrom.com>
+    meta.crossplane.io/source: github.com/MonsieurDahlstrom/xp-fn-node-cidr
+    meta.crossplane.io/license: ISC
+    meta.crossplane.io/description: |
+      A Crossplane Function that calculates subnet allocations from a base CIDR block 
+      based on percentage requirements. Generates properly aligned CIDR blocks with 
+      deterministic allocation behavior.
+    meta.crossplane.io/readme: |
+      # CIDR Calculator Function
+      
+      This function accepts a base CIDR and layout specifications with percentages,
+      then returns properly aligned subnet allocations following CIDR standards.
+      
+      ## Input Format
+      ```yaml
+      apiVersion: network.example.com/v1alpha1
+      kind: CIDRCalculatorInput
+      spec:
+        baseCIDR: "10.0.0.0/24"
+        layout:
+        - name: web
+          percentage: 25
+        - name: api
+          percentage: 25
+      ```
+      
+      ## Features
+      - Valid CIDR allocation with proper alignment
+      - Deterministic subnet allocation
+      - Reserve subnet handling for unused space
+      - Space-efficient allocation algorithm
+spec:
+  crossplane:
+    version: ">=v1.14.0" 

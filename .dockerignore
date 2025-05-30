@@ -6,3 +6,7 @@ dist
 !package.json
 !package-lock.json
 !tsconfig.json
+# Allow package.yaml for Crossplane Function
+!package.yaml
+# Allow proto directory for gRPC definitions
+!proto/

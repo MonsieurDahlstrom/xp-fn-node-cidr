@@ -37,6 +37,10 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "ip-cidr": "^4.0.2"
+    "ip-cidr": "^4.0.2",
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.0",
+    "@types/google-protobuf": "^3.15.12",
+    "google-protobuf": "^3.21.2"
   }
 }
