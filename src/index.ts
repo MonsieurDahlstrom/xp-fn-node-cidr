@@ -1,91 +1,85 @@
-import fs from 'fs';
-import yaml from 'js-yaml';
-import CIDR from 'ip-cidr';
+import { calculateSubnets } from './cidr.js';
 
-interface SubnetConfig {
-    name: string;
-    percent: number;
+interface CrossplaneRequest {
+    desired: any;
+    observed: any;
+    input: {
+        baseCIDR: string;
+        layout: Array<{
+            name: string;
+            percentage: number;
+        }>;
+    };
 }
 
-interface LayoutInput {
-    baseCIDR: string;
-    layout: SubnetConfig[];
+interface CrossplaneResponse {
+    desired: {
+        apiVersion: string;
+        kind: string;
+        metadata: {
+            name: string;
+        };
+        spec: {
+            baseCIDR: string;
+            subnets: Array<{
+                name: string;
+                cidr: string;
+            }>;
+        };
+    };
 }
 
-interface SubnetOutput {
-    name: string;
-    cidr: string;
-    prefix: number;
-}
+async function main() {
+    try {
+        // Read input from stdin
+        const chunks: Buffer[] = [];
+        for await (const chunk of process.stdin) {
+            chunks.push(chunk);
+        }
+        const inputData = Buffer.concat(chunks).toString();
+        const request: CrossplaneRequest = JSON.parse(inputData);
 
-// Convert dotted IPv4 string to a 32-bit number
-function ipToLong(ip: string): number {
-    return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0);
-}
+        // Validate input
+        if (!request.input?.baseCIDR || !request.input?.layout) {
+            const errorResponse = {
+                status: 400,
+                message: 'Missing required fields: baseCIDR and layout'
+            };
+            console.log(JSON.stringify(errorResponse));
+            process.exit(1);
+        }
 
-// Convert a 32-bit number back to a dotted IPv4 string
-function longToIp(long: number): string {
-    return [
-        (long >>> 24) & 255,
-        (long >>> 16) & 255,
-        (long >>> 8) & 255,
-        long & 255,
-    ].join('.');
-}
-
-function calculateSubnets(baseCIDR: string, layout: SubnetConfig[]): SubnetOutput[] {
-    const base = new CIDR(baseCIDR);
-
-    if (!CIDR.isValidAddress(baseCIDR)) {
-        throw new Error(`Invalid base CIDR: ${baseCIDR}`);
-    }
-
-    const prefixLength = parseInt(baseCIDR.split('/')[1], 10);
-    const totalIPs = Math.pow(2, 32 - prefixLength);
-
-    let currentLong = ipToLong(base.start());
-
-    const subnets: SubnetOutput[] = [];
-
-    for (const entry of layout) {
-        const requiredIPs = Math.ceil(totalIPs * (entry.percent / 100));
-        const subnetPrefix = 32 - Math.ceil(Math.log2(requiredIPs));
-        const subnetSize = Math.pow(2, 32 - subnetPrefix);
-
-        const subnetStartIp = longToIp(currentLong);
-        const subnetCIDR = `${subnetStartIp}/${subnetPrefix}`;
-
-        subnets.push({
-            name: entry.name,
-            cidr: subnetCIDR,
-            prefix: subnetPrefix
+        // Calculate subnets using the new function signature
+        const subnets = calculateSubnets({
+            baseCIDR: request.input.baseCIDR,
+            layout: request.input.layout
         });
 
-        currentLong += subnetSize;
-    }
+        // Create response
+        const response: CrossplaneResponse = {
+            desired: {
+                apiVersion: 'network.example.com/v1',
+                kind: 'NetworkLayout',
+                metadata: {
+                    name: 'calculated-subnets'
+                },
+                spec: {
+                    baseCIDR: request.input.baseCIDR,
+                    subnets
+                }
+            }
+        };
 
-    return subnets;
+        // Write response to stdout
+        console.log(JSON.stringify(response));
+    } catch (error) {
+        const errorResponse = {
+            status: 500,
+            message: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        console.log(JSON.stringify(errorResponse));
+        process.exit(1);
+    }
 }
 
-// Load and parse layout input
-const rawInput = fs.readFileSync('network-layout.json', 'utf-8');
-const config: LayoutInput = JSON.parse(rawInput);
-
-// Generate subnets
-const subnets = calculateSubnets(config.baseCIDR, config.layout);
-
-// Output to YAML
-const output = {
-    apiVersion: 'network.example.org/v1alpha1',
-    kind: 'NetworkLayout',
-    metadata: {
-        name: 'calculated-layout'
-    },
-    spec: {
-        baseCIDR: config.baseCIDR,
-        subnets
-    }
-};
-
-fs.writeFileSync('output.yaml', yaml.dump(output), 'utf-8');
-console.log('✅ output.yaml generated.');
+main();
