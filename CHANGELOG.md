@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.0.2...v1.1.0) (2025-05-31)
+
+
+### Bug Fixes
+
+* moved from js to cjs for semantic release ([5a38e01](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/5a38e01e226ffe2fad4d781cac0cc91e437c5cd7))
+
+
+### Features
+
+* Initial crossplane function  definition ([7611443](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/76114436aa08c7cece8f63e5db974b2606dcb732))
+
 # [1.1.0-next.1](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.0.2...v1.1.0-next.1) (2025-05-31)
 
 
