@@ -60,6 +60,47 @@ function convertProtobufStruct(fields: any): any {
     return result;
 }
 
+// Helper function to convert JavaScript objects to protobuf struct format
+function convertToProtobufStruct(obj: any): any {
+    if (obj === null || obj === undefined) {
+        return { nullValue: 'NULL_VALUE' };
+    }
+
+    if (typeof obj === 'string') {
+        return { stringValue: obj };
+    }
+
+    if (typeof obj === 'number') {
+        return { numberValue: obj };
+    }
+
+    if (typeof obj === 'boolean') {
+        return { boolValue: obj };
+    }
+
+    if (Array.isArray(obj)) {
+        return {
+            listValue: {
+                values: obj.map(item => convertToProtobufStruct(item))
+            }
+        };
+    }
+
+    if (typeof obj === 'object') {
+        const fields: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            fields[key] = convertToProtobufStruct(value);
+        }
+        return {
+            structValue: {
+                fields: fields
+            }
+        };
+    }
+
+    return { stringValue: String(obj) };
+}
+
 // Define the interfaces matching the proto
 interface RunFunctionRequest {
     meta?: { tag?: string };
@@ -164,21 +205,21 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
         const subnetResult = calculateSubnets({ baseCIDR, layout });
         console.log('Calculated subnets:', subnetResult);
 
-        // Create the desired state with the subnet calculation results
-        const desiredComposite = {
-            resource: {
-                ...observedComposite,
-                status: {
-                    ...observedComposite.status,
-                    subnets: subnetResult,
-                    summary: {
-                        baseCIDR: baseCIDR,
-                        totalSubnets: subnetResult.length,
-                        utilizedAddresses: subnetResult.reduce((sum: number, subnet: any) => sum + (subnet.totalAddresses || 0), 0)
-                    }
-                }
+        // Create the status object that we want to update
+        const statusUpdate = {
+            subnets: subnetResult,
+            summary: {
+                baseCIDR: baseCIDR,
+                totalSubnets: subnetResult.length,
+                utilizedAddresses: subnetResult.reduce((sum: number, subnet: any) => sum + (subnet.totalAddresses || 0), 0)
             }
         };
+
+        // According to the proto specification, functions should only set the desired status
+        // of composite resources, not metadata or spec. Create a resource with only status.
+        const desiredCompositeResource = convertToProtobufStruct({
+            status: statusUpdate
+        });
 
         const response: RunFunctionResponse = {
             meta: {
@@ -186,7 +227,9 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
                 ttl: { seconds: 60 } // Cache for 60 seconds
             },
             desired: {
-                composite: desiredComposite,
+                composite: {
+                    resource: desiredCompositeResource
+                },
                 resources: request?.desired?.resources || {}
             },
             results: [{
@@ -197,6 +240,9 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
         };
 
         console.log('Sending response with calculated subnets');
+        console.log('Status update object:', JSON.stringify(statusUpdate, null, 2));
+        console.log('Desired composite resource structure:', JSON.stringify(desiredCompositeResource, null, 2));
+        console.log('Full response structure:', JSON.stringify(response, null, 2));
         callback(null, response);
 
     } catch (error) {
