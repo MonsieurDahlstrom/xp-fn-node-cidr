@@ -215,18 +215,33 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
             }
         };
 
-        // Test: Let's try adding an annotation to verify the function is working
-        // and then also try setting status through metadata
-        const desiredCompositeResource = convertToProtobufStruct({
+        // Since Crossplane functions cannot directly set composite resource status,
+        // we'll create a ConfigMap managed resource to store the calculated data
+        const configMapName = `${observedComposite.metadata?.name || 'unknown'}-cidr-results`;
+
+        const configMapResource = convertToProtobufStruct({
+            apiVersion: 'v1',
+            kind: 'ConfigMap',
             metadata: {
-                annotations: {
-                    'cidr-calculator.crossplane.io/calculated-subnets': JSON.stringify(subnetResult),
-                    'cidr-calculator.crossplane.io/total-subnets': subnetResult.length.toString(),
-                    'cidr-calculator.crossplane.io/base-cidr': baseCIDR
+                name: configMapName,
+                labels: {
+                    'app.kubernetes.io/managed-by': 'crossplane',
+                    'cidr-calculator.crossplane.io/composite': observedComposite.metadata?.name || 'unknown'
                 }
             },
-            status: statusUpdate
+            data: {
+                'subnets.json': JSON.stringify(subnetResult, null, 2),
+                'summary.json': JSON.stringify(statusUpdate.summary, null, 2),
+                'baseCIDR': baseCIDR,
+                'totalSubnets': subnetResult.length.toString()
+            }
         });
+
+        // Get existing desired resources and add our ConfigMap
+        const desiredResources = request?.desired?.resources || {};
+        desiredResources['cidr-results-configmap'] = {
+            resource: configMapResource
+        };
 
         const response: RunFunctionResponse = {
             meta: {
@@ -234,21 +249,19 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
                 ttl: { seconds: 60 } // Cache for 60 seconds
             },
             desired: {
-                composite: {
-                    resource: desiredCompositeResource
-                },
-                resources: request?.desired?.resources || {}
+                composite: request?.desired?.composite || {},
+                resources: desiredResources
             },
             results: [{
                 severity: 'SEVERITY_NORMAL',
-                message: `Successfully calculated ${subnetResult.length} subnets for ${baseCIDR}: ${subnetResult.map(s => s.name + '=' + s.cidr).join(', ')}. Added annotations for testing.`,
+                message: `Successfully calculated ${subnetResult.length} subnets for ${baseCIDR}: ${subnetResult.map(s => s.name + '=' + s.cidr).join(', ')}. Results stored in ConfigMap '${configMapName}'.`,
                 reason: 'SubnetCalculationComplete'
             }]
         };
 
         console.log('Sending response with calculated subnets');
         console.log('Status update object:', JSON.stringify(statusUpdate, null, 2));
-        console.log('Desired composite resource structure:', JSON.stringify(desiredCompositeResource, null, 2));
+        console.log('Desired composite resource structure:', JSON.stringify(desiredResources, null, 2));
         console.log('Full response structure:', JSON.stringify(response, null, 2));
         callback(null, response);
 
