@@ -1,3 +1,10 @@
+# [1.2.0-next.1](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.1.0...v1.2.0-next.1) (2025-06-01)
+
+
+### Features
+
+* Added status update to function ([9a7c80c](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/9a7c80cfe3199bda3b685cd75581c7a96113a908))
+
 # [1.1.0](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.0.2...v1.1.0) (2025-05-31)
 
 
