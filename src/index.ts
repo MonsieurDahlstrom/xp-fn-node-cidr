@@ -215,9 +215,16 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
             }
         };
 
-        // According to the proto specification, functions should only set the desired status
-        // of composite resources, not metadata or spec. Create a resource with only status.
+        // Test: Let's try adding an annotation to verify the function is working
+        // and then also try setting status through metadata
         const desiredCompositeResource = convertToProtobufStruct({
+            metadata: {
+                annotations: {
+                    'cidr-calculator.crossplane.io/calculated-subnets': JSON.stringify(subnetResult),
+                    'cidr-calculator.crossplane.io/total-subnets': subnetResult.length.toString(),
+                    'cidr-calculator.crossplane.io/base-cidr': baseCIDR
+                }
+            },
             status: statusUpdate
         });
 
@@ -234,7 +241,7 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
             },
             results: [{
                 severity: 'SEVERITY_NORMAL',
-                message: `Successfully calculated ${subnetResult.length} subnets for ${baseCIDR}: ${subnetResult.map(s => s.name + '=' + s.cidr).join(', ')}`,
+                message: `Successfully calculated ${subnetResult.length} subnets for ${baseCIDR}: ${subnetResult.map(s => s.name + '=' + s.cidr).join(', ')}. Added annotations for testing.`,
                 reason: 'SubnetCalculationComplete'
             }]
         };
