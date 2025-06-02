@@ -1,3 +1,10 @@
+# [1.2.0-next.6](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.2.0-next.5...v1.2.0-next.6) (2025-06-02)
+
+
+### Bug Fixes
+
+* furter debug of function output ([e3d96de](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/commit/e3d96dea687579d3a5fc68bb7289cc9532e6888a))
+
 # [1.2.0-next.5](https://github.com/MonsieurDahlstrom/xp-fn-node-cidr/compare/v1.2.0-next.4...v1.2.0-next.5) (2025-06-02)
 
 
