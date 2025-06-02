@@ -205,20 +205,10 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
         const subnetResult = calculateSubnets({ baseCIDR, layout });
         console.log('Calculated subnets:', subnetResult);
 
-        // Create the status object that we want to update
-        const statusUpdate = {
-            subnets: subnetResult,
-            summary: {
-                baseCIDR: baseCIDR,
-                totalSubnets: subnetResult.length,
-                utilizedAddresses: subnetResult.reduce((sum: number, subnet: any) => sum + (subnet.totalAddresses || 0), 0)
-            }
-        };
-
         // Create a ConfigMap to store the calculated subnet data (as a managed resource)
         const configMapName = `${observedComposite.metadata?.name || 'unknown'}-cidr-results`;
 
-        // Create the ConfigMap resource - don't use protobuf conversion, pass raw object
+        // Create the ConfigMap resource following the working pattern from Go examples
         const configMapResource = {
             apiVersion: 'v1',
             kind: 'ConfigMap',
@@ -231,21 +221,22 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
             },
             data: {
                 'subnets.json': JSON.stringify(subnetResult, null, 2),
-                'summary.json': JSON.stringify(statusUpdate.summary, null, 2),
+                'summary.json': JSON.stringify({
+                    baseCIDR: baseCIDR,
+                    totalSubnets: subnetResult.length,
+                    utilizedAddresses: subnetResult.reduce((sum: number, subnet: any) => sum + (subnet.totalAddresses || 0), 0)
+                }, null, 2),
                 'baseCIDR': baseCIDR,
-                'totalSubnets': subnetResult.length.toString(),
-                'utilizedAddresses': statusUpdate.summary.utilizedAddresses.toString()
+                'totalSubnets': subnetResult.length.toString()
             }
         };
 
-        // Get existing desired resources and add our ConfigMap
+        // Get existing desired resources and add our ConfigMap 
+        // Following the exact pattern: desired[resource.Name("name")] = &resource.DesiredComposed{Resource: cd}
         const desiredResources = request?.desired?.resources || {};
         desiredResources['cidr-results-configmap'] = {
-            resource: configMapResource  // Pass raw resource object
+            resource: convertToProtobufStruct(configMapResource)
         };
-
-        // Keep the composite resource simple - don't try to update status
-        const desiredComposite = request?.desired?.composite || {};
 
         const response: RunFunctionResponse = {
             meta: {
@@ -253,20 +244,17 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
                 ttl: { seconds: 60 } // Cache for 60 seconds
             },
             desired: {
-                composite: desiredComposite,
+                composite: request?.desired?.composite,
                 resources: desiredResources
             },
             results: [{
                 severity: 'SEVERITY_NORMAL',
-                message: `Successfully calculated ${subnetResult.length} subnets for ${baseCIDR}: ${subnetResult.map(s => s.name + '=' + s.cidr).join(', ')}. Results stored in ConfigMap '${configMapName}'.`,
+                message: `Successfully calculated ${subnetResult.length} subnets for ${baseCIDR}. Results stored in ConfigMap '${configMapName}'.`,
                 reason: 'SubnetCalculationComplete'
             }]
         };
 
         console.log('Sending response with calculated subnets');
-        console.log('Status update object:', JSON.stringify(statusUpdate, null, 2));
-        console.log('Desired composite resource structure:', JSON.stringify(desiredResources, null, 2));
-        console.log('Full response structure:', JSON.stringify(response, null, 2));
         callback(null, response);
 
     } catch (error) {
