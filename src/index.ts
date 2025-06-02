@@ -232,11 +232,9 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
         };
 
         // Get existing desired resources and add our ConfigMap 
-        // Following the exact pattern: desired[resource.Name("name")] = &resource.DesiredComposed{Resource: cd}
+        // Following the correct protobuf format from working examples
         const desiredResources = request?.desired?.resources || {};
-        desiredResources['cidr-results-configmap'] = {
-            resource: convertToProtobufStruct(configMapResource)
-        };
+        desiredResources['cidr-results-configmap'] = convertToProtobufStruct(configMapResource);
 
         const response: RunFunctionResponse = {
             meta: {
