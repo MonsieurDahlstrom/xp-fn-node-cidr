@@ -219,7 +219,8 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
         // we'll create a ConfigMap managed resource to store the calculated data
         const configMapName = `${observedComposite.metadata?.name || 'unknown'}-cidr-results`;
 
-        const configMapResource = convertToProtobufStruct({
+        // Create the ConfigMap resource with proper structure
+        const configMapResource = {
             apiVersion: 'v1',
             kind: 'ConfigMap',
             metadata: {
@@ -235,12 +236,15 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
                 'baseCIDR': baseCIDR,
                 'totalSubnets': subnetResult.length.toString()
             }
-        });
+        };
+
+        // Convert to protobuf format
+        const configMapProtobuf = convertToProtobufStruct(configMapResource);
 
         // Get existing desired resources and add our ConfigMap
         const desiredResources = request?.desired?.resources || {};
         desiredResources['cidr-results-configmap'] = {
-            resource: configMapResource
+            resource: configMapProtobuf
         };
 
         const response: RunFunctionResponse = {
