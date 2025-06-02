@@ -218,7 +218,7 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
         // Create a ConfigMap to store the calculated subnet data (as a managed resource)
         const configMapName = `${observedComposite.metadata?.name || 'unknown'}-cidr-results`;
 
-        // Create the ConfigMap resource with proper structure
+        // Create the ConfigMap resource - don't use protobuf conversion, pass raw object
         const configMapResource = {
             apiVersion: 'v1',
             kind: 'ConfigMap',
@@ -241,23 +241,11 @@ function runFunction(call: grpc.ServerUnaryCall<RunFunctionRequest, RunFunctionR
         // Get existing desired resources and add our ConfigMap
         const desiredResources = request?.desired?.resources || {};
         desiredResources['cidr-results-configmap'] = {
-            resource: configMapResource
+            resource: configMapResource  // Pass raw resource object
         };
 
-        // Update composite resource status with simple fields (following JavaScript example pattern)
-        const desiredComposite = request?.desired?.composite || { resource: {} };
-        if (!desiredComposite.resource) {
-            desiredComposite.resource = {};
-        }
-        if (!desiredComposite.resource.status) {
-            desiredComposite.resource.status = {};
-        }
-
-        // Only set simple status fields that can be displayed in kubectl describe
-        desiredComposite.resource.status.configMapName = configMapName;
-        desiredComposite.resource.status.totalSubnets = subnetResult.length;
-        desiredComposite.resource.status.baseCIDR = baseCIDR;
-        desiredComposite.resource.status.message = `Calculated ${subnetResult.length} subnets stored in ConfigMap '${configMapName}'`;
+        // Keep the composite resource simple - don't try to update status
+        const desiredComposite = request?.desired?.composite || {};
 
         const response: RunFunctionResponse = {
             meta: {
